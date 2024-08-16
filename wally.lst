@@ -73,19 +73,33 @@
            0239  F0 11     BEQ NEWLIN              ;                    ;
            023B  B5 00     LDA BOARD,X             ;                    ;
            023D  A8        TAY                     ;                    ;
-           023E  B9 XX XX  LDA STONES,Y            ;                    ;
+           023E  B9 72 02  LDA STONES,Y            ;                    ;
            0241  20 A0 1E  JSR $1EA0               ;                    ;
            0244  20 9E 1E  JSR $1E9E               ;                    ;
   SKIPSQ:  0247  E8        INX                     ;                    ;
            0248  D0 E6     BNE PSLOOP              ;                    ;
-           024A  F0 XX     BEQ ENDPRB              ;                    ;
+           024A  F0 29     BEQ RETPRN              ;                    ;
   NEWLIN:  024C  8A        TXA                     ;                    ;
            024D  48        PHA                     ;                    ;
            024E  20 2F 1E  JSR $1E2F               ;                    ;
            0251  68        PLA                     ;                    ;
            0252  AA        TAX                     ;                    ;
-           ...
-           XXXX  4C 47 02  JMP SKIPSQ
-
+           0253  29 F0     AND #$F0                ;
+           0255  4A        LSR                     ;
+           0256  4A        LSR                     ;
+           0257  4A        LSR                     ;
+           0258  4A        LSR                     ;
+           0259  C9 08     CMP #$08                ;                    ;
+           025B  B0 02     BCS ADDDGT              ;                    ;
+           025D  90 05     BCC ADDCHR              ;                    ;
+  ADDDGT:  025F  69 38     ADD #$38                ;                    ;
+           0261  4C 69 02  JMP PRNROW              ;                    ;
+  ADDCHR:  0264  69 32     ADD #$32                ;                    ;
+           0266  4C 69 02  JMP PRNROW              ;                    ;
+  PRNROW:  0269  20 A0 1E  JSR $1EA0               ;
+           026C  20 9E 1E  JSR $1E9E               ;
+           026F  4C 47 02  JMP SKIPSQ
+  STONES:  0272  2E 58 4F  .BYTE '.', '#', 'O'     ;
+  RETPRN:  0275  60        RTS
 
 
