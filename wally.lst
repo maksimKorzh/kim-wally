@@ -33,12 +33,13 @@
 ;                                                                       ;
 ;            EMPTY = 0; BLACK = 1; WHITE = 2; MARKER = 4;               ;
 ;-----------------------------------------------------------------------;
+
 ;-----------------------------------------------------------------------;
-;                               VARIABLES                               ;
+;                                VARIABLES                              ;
 ;-----------------------------------------------------------------------;
 ; BOARD    $0000-$00EE                                                  ;
+; STONES   $0272-$0274                                                  ;
 ;-----------------------------------------------------------------------;
-
 
 ;-----------------------------------------------------------------------;
 ;                               PRINT BOARD                             ;
@@ -69,7 +70,7 @@
            0231  C9 EF     CMP #$EF                ;                    ;
            0233  B0 12     BCS SKIPSQ              ;                    ;
            0235  29 0F     AND #$0F                ;                    ;
-           0237  C9 0F     CMP #$0F                ;                    ;
+           0237  C9 0F     CMP #$0F                ;   Print position   ;
            0239  F0 11     BEQ NEWLIN              ;                    ;
            023B  B5 00     LDA BOARD,X             ;                    ;
            023D  A8        TAY                     ;                    ;
@@ -79,27 +80,26 @@
   SKIPSQ:  0247  E8        INX                     ;                    ;
            0248  D0 E6     BNE PSLOOP              ;                    ;
            024A  F0 29     BEQ RETPRN              ;                    ;
-  NEWLIN:  024C  8A        TXA                     ;                    ;
+  NEWLIN:  024C  8A        TXA                     ;--------------------;
            024D  48        PHA                     ;                    ;
-           024E  20 2F 1E  JSR $1E2F               ;                    ;
+           024E  20 2F 1E  JSR $1E2F               ;   Print new line   ;
            0251  68        PLA                     ;                    ;
-           0252  AA        TAX                     ;                    ;
-           0253  29 F0     AND #$F0                ;
-           0255  4A        LSR                     ;
-           0256  4A        LSR                     ;
-           0257  4A        LSR                     ;
-           0258  4A        LSR                     ;
+           0252  AA        TAX                     ;--------------------;
+           0253  29 F0     AND #$F0                ;                    ;
+           0255  4A        LSR                     ;                    ;
+           0256  4A        LSR                     ;                    ;
+           0257  4A        LSR                     ;                    ;
+           0258  4A        LSR                     ;                    ;
            0259  C9 08     CMP #$08                ;                    ;
            025B  B0 02     BCS ADDDGT              ;                    ;
            025D  90 05     BCC ADDCHR              ;                    ;
-  ADDDGT:  025F  69 38     ADD #$38                ;                    ;
+  ADDDGT:  025F  69 38     ADD #$38                ;     Print row      ;
            0261  4C 69 02  JMP PRNROW              ;                    ;
   ADDCHR:  0264  69 32     ADD #$32                ;                    ;
            0266  4C 69 02  JMP PRNROW              ;                    ;
-  PRNROW:  0269  20 A0 1E  JSR $1EA0               ;
-           026C  20 9E 1E  JSR $1E9E               ;
-           026F  4C 47 02  JMP SKIPSQ
-  STONES:  0272  2E 58 4F  .BYTE '.', '#', 'O'     ;
-  RETPRN:  0275  60        RTS
-
-
+  PRNROW:  0269  20 A0 1E  JSR $1EA0               ;                    ;
+           026C  20 9E 1E  JSR $1E9E               ;                    ;
+           026F  4C 47 02  JMP SKIPSQ              ;                    ;
+  STONES:  0272  2E 58 4F  .BYTE '.', '#', 'O'     ;                    ;
+  RETPRN:  0275  60        RTS                     ;                    ;
+;-----------------------------------------------------------------------;
