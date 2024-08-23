@@ -19,7 +19,7 @@
 ;    30  31  32  32  34  35  36  37  38  39  41  42  43  44  45  46     ;
 ;    31  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    32  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
-;    33  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4E  2E  2E     ;
+;    33  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
 ;    34  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    35  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    36  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
@@ -28,7 +28,7 @@
 ;    39  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    41  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    42  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
-;    43  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4E  2E  2E     ;
+;    43  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
 ;    44  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    45  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    46  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
@@ -45,15 +45,15 @@
   PRLOOP:  0203  8A        TXA                     ;                    ;
            0204  29 0F     AND #$0F                ;                    ;
            0206  F0 0D     BEQ NEWLIN              ;                    ;
-  PRNCHR:  0208  B5 00     LDA $00,X               ;                    ;
-           020A  20 A0 1E  JSR $1EA0               ;                    ;
-           020D  20 9E 1E  JSR $1E9E               ;                    ;
+  PRNCHR:  0208  B5 00     LDA BOARD,X             ;                    ;
+           020A  20 A0 1E  JSR $OUTCH              ;                    ;
+           020D  20 9E 1E  JSR $OUTSP              ;                    ;
            0210  E8        INX                     ;    Print board     ;
            0211  D0 F0     BNE PRLOOP              ;   ($0200-$021E)    ;
            0213  F0 09     BEQ PRNRET              ;      31 bytes      ;
   NEWLIN:  0215  8A        TXA                     ;                    ;
            0216  48        PHA                     ;                    ;
-           0217  20 2F 1E  JSR $1E2F               ;                    ;
+           0217  20 2F 1E  JSR CRLF                ;                    ;
            021A  68        PLA                     ;                    ;
            021B  AA        TAX                     ;                    ;
            021C  90 EA     BCC PRNCHR              ;                    ;
@@ -61,7 +61,7 @@
 ;-----------------------------------------------------------------------;
   CLRBRD:  021F  A2 00     LDX #$00                ;                    ;
            0221  A9 2E     LDA #$2E                ;    Clear board     ;
-  CLEARL:  0223  95 00     STA $00,X               ;   ($021F-$0228)    ;
+  CLEARL:  0223  95 00     STA BOARD,X             ;   ($021F-$0228)    ;
            0225  E8        INX                     ;      10 bytes      ;
            0226  D0 FB     BNE CLEARL              ;                    ;
            0228  60        RTS                     ;                    ;
@@ -75,14 +75,14 @@
 ;-----------------------------------------------------------------------;
   PCOORD:  0239  A2 00     LDX #$00                ;                    ;
   COLLOP:  023B  BD 29 02  LDA COORDS,X            ;                    ;
-           023E  95 00     STA $00,X               ;                    ;
+           023E  95 00     STA BOARD,X             ;                    ;
            0240  E8        INX                     ;                    ;
            0241  E0 10     CPX #$10                ;                    ;
            0243  D0 F6     BNE COLLOP              ;                    ;
            0245  A0 00     LDY #$00                ;                    ;
            0247  A2 00     LDX #$00                ;    Print coords    ;
   ROWLOP:  0249  B9 29 02  LDA COORDS,Y            ;    ($0239-$0258)   ;
-           024C  95 00     STA $00,X               ;      32 bytes      ;
+           024C  95 00     STA BOARD,X             ;      32 bytes      ;
            024E  8A        TXA                     ;                    ;
            024F  18        CLC                     ;                    ;
            0250  69 10     ADC #$10                ;                    ;
@@ -92,3 +92,64 @@
            0256  D0 F1     BNE ROWLOP              ;                    ;
            0258  60        RTS                     ;                    ;
 ;-----------------------------------------------------------------------;
+  USRMOV:  0259  00        .BYTE 0                 ;  User move ($0259) ;
+;-----------------------------------------------------------------------;
+  USRINP:  025A  18        CLC                     ;                    ;
+  KEYDN1:  025B  20 6A 1F  JSR GETKEY              ;                    ;
+           025E  C9 10     CMP #$10                ;                    ;
+           0260  B0 F9     BCS KEYDN1              ;                    ;
+           0262  0A        ASL                     ;                    ;
+           0263  0A        ASL                     ;                    ;
+           0264  0A        ASL                     ;                    ;
+           0265  0A        ASL                     ;                    ;
+           0266  8D 59 02  STA USRMOV              ;                    ;
+  KEYUP1:  0269  20 6A 1F  JSR GETKEY              ;      Set stone     ;
+           026C  C9 15     CMP #$15                ;    ($025A-$0285)   ;
+           026E  D0 F9     BNE KEYUP1              ;      44 bytes      ;
+  KEYDN2:  0270  18        CLC                     ;                    ;
+           0271  20 6A 1F  JSR GETKEY              ;                    ;
+           0274  C9 10     CMP #$10                ;                    ;
+           0276  B0 F9     BCS KEYDN2              ;                    ;
+           0278  0D 59 02  ORA USRMOV              ;                    ;
+           027B  8D 59 02  STA USRMOV              ;                    ;
+           027E  AE 59 02  LDX USRMOV              ;                    ;
+           0281  A9 4F     LDA #$4F                ;                    ;
+           0283  95 00     STA BOARD,X             ;                    ;
+           0285  60        RTS                     ;                    ;
+;-----------------------------------------------------------------------;
+
+
+
+
+
+  CNTLIB:  XXXX  18        CLC                     ;                    ;
+           XXXX  E0 10     CPX #$10                ;                    ;
+           XXXX  90 XX     BCC CNTRET              ;                    ;
+           XXXX  8A        TXA                     ;                    ;
+           XXXX  29 0F     AND #$0F                ;                    ;
+           XXXX  F0 XX     BEQ CNTRET              ;                    ;
+
+
+
+
+
+;-----------------------------------------------------------------------;
+  PROGST:  XXXX  D8        CLD                     ;   Program start    ;
+           XXXX  20 1F 02  JSR CLRBRD              ;   ($XXXX-$XXXX)    ;
+           XXXX  20 39 02  JSR PCOORD              ;      7 bytes       ;
+;-----------------------------------------------------------------------;
+  PROGLP:  XXXX  20 00 02  JSR PRNBRD              ;     Main loop      ;
+           XXXX  20 5A 02  JSR USRINP              ;   ($XXXX-$XXXX)    ;
+           XXXX  4C XX XX  JMP PROGLP              ;     XX bytes       ;
+;-----------------------------------------------------------------------;
+
+
+
+
+
+
+
+
+
+
+
