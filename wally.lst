@@ -118,53 +118,53 @@
            0285  60        RTS                     ;                    ;
 ;-----------------------------------------------------------------------;
   CCOLOR:  0286  00        .BYTE 0                 ;                    ;
-  LIBRTS:  0287  00        .BYTE 0                 ;                    ;
 ;-----------------------------------------------------------------------;
-  COUNTL:  0288  18        CLC                     ;                    ;
-           0289  E0 10     CPX #$10                ;                    ;
-           028B  90 XX     BCC CNTRET              ;                    ;
-           028D  8A        TXA                     ;                    ;
-           028E  29 0F     AND #$0F                ;                    ;
-           0290  F0 XX     BEQ CNTRET              ;                    ;
+  COUNTL:  0287  A0 00     LDY #$00                ;                    ;
+  COUNTR:  0289  18        CLC                     ;                    ;
+           028A  E0 10     CPX #$10                ;                    ;
+           028C  90 40     BCC CNTRET              ;                    ;
+           028E  8A        TXA                     ;                    ;
+           028F  29 0F     AND #$0F                ;                    ;
+           0291  F0 3B     BEQ CNTRET              ;                    ;
  ;-------------------------------------------------;                    ;
-           0292  B5 00     LDA $00,X               ;                    ;
-           0294  C5 2E     CMP #$2E                ;                    ;
-           0296  F0 XX     BEQ MARKLB              ;                    ;
-           0298  CD 86 02  CMP CCOLOR              ;                    ;
-           029B  D0 FF     BNE CNTRET              ;                    ;
-           029D  C9 20     AND #$20                ;                    ;
-           029F  D0 XX     BNE CNTRET              ;                    ;
+           0293  B5 00     LDA $00,X               ;                    ;
+           0295  C9 2E     CMP #$2E                ;                    ;
+           0297  F0 30     BEQ MARKLB              ;                    ;
+           0299  CD 86 02  CMP CCOLOR              ;                    ;
+           029C  D0 30     BNE CNTRET              ;                    ;
+           029E  29 20     AND #$20                ;                    ;
+           02A0  D0 2C     BNE CNTRET              ;                    ;
  ;-------------------------------------------------;                    ;
-           02A1  B5 00     LDA $00,X               ;                    ;
-           02A3  09 20     ORA #$20                ;                    ;
-           02A5  95 00     STA $00,X               ;                    ;
-           02A7  E8        INX                     ;                    ;
-           02A8  20 88 02  JSR COUNTL              ;                    ;
-           02AB  CA        DEX                     ;  Count liberties   ;
-           02AC  CA        DEX                     ;                    ;
-           02AD  20 88 02  JSR COUNTL              ;                    ;
-           02B0  8A        TXA                     ;                    ;
-           02B1  18        CLC                     ;                    ;
-           02B2  E9 0E     SBC #$0E                ;                    ;
-           02B4  AA        TAX                     ;                    ;
-           02B5  20 88 02  JSR COUNTL              ;                    ;
-           02B8  8A        TXA                     ;                    ;
-           02B9  18        CLC                     ;                    ;
-           02BA  69 20     ADC #$20                ;                    ;
-           02BC  AA        TAX                     ;                    ;
-           02BD  20 88 02  JSR COUNTL              ;                    ;
-           02C0  8A        TXA                     ;                    ;
-           02C1  18        CLC                     ;                    ;
-           02C2  E9 10     SBC #$10                ;                    ;
-           02C4  AA        TAX                     ;                    ;
-           02C5  18        CLC                     ;                    ;
-           02C6  90 XX     BCC CNTRET              ;                    ;
+           02A2  B5 00     LDA $00,X               ;                    ;
+           02A4  09 20     ORA #$20                ;                    ;
+           02A6  95 00     STA $00,X               ;                    ;
+           02A8  E8        INX                     ;                    ;
+           02A9  20 89 02  JSR COUNTR              ;                    ;
+           02AC  CA        DEX                     ;  Count liberties   ;
+           02AD  CA        DEX                     ;   ($0287-$02CE)    ;
+           02AE  20 89 02  JSR COUNTR              ;     72 bytes       ;
+           02B1  8A        TXA                     ;                    ;
+           02B2  18        CLC                     ;                    ;
+           02B3  E9 0E     SBC #$0E                ;                    ;
+           02B5  AA        TAX                     ;                    ;
+           02B6  20 89 02  JSR COUNTR              ;                    ;
+           02B9  8A        TXA                     ;                    ;
+           02BA  18        CLC                     ;                    ;
+           02BB  69 20     ADC #$20                ;                    ;
+           02BD  AA        TAX                     ;                    ;
+           02BE  20 89 02  JSR COUNTR              ;                    ;
+           02C1  8A        TXA                     ;                    ;
+           02C2  18        CLC                     ;                    ;
+           02C3  E9 0F     SBC #$0F                ;                    ;
+           02C5  AA        TAX                     ;                    ;
+           02C6  18        CLC                     ;                    ;
+           02C7  90 05     BCC CNTRET              ;                    ;
 ;--------------------------------------------------;                    ;
-  MARKLB:  02C8  A9 6E     LDA #$6E                ;                    ;
-           02CA  95 00     STA $00,X               ;                    ;
-           02CC  EE 87 02  INC LIBRTS              ;                    ;
+  MARKLB:  02C9  A9 6E     LDA #$2B                ;                    ;
+           02CB  95 00     STA $00,X               ;                    ;
+           02CD  C8        INY                     ;                    ;
 ;--------------------------------------------------;                    ;
-  CNTRET:  02CF  60        RTS                     ;                    ;
+  CNTRET:  02CE  60        RTS                     ;                    ;
 ;-----------------------------------------------------------------------;
 
 
@@ -174,9 +174,18 @@
   PROGST:  XXXX  D8        CLD                     ;   Program start    ;
            XXXX  20 1F 02  JSR CLRBRD              ;   ($XXXX-$XXXX)    ;
            XXXX  20 39 02  JSR PCOORD              ;      7 bytes       ;
+;--------------------------------------------------;                    ;
+           XXXX  A9 4F     LDA #$4F
+           XXXX  85 22
+           XXXX  85 23
+           XXXX  85 24
 ;-----------------------------------------------------------------------;
   PROGLP:  XXXX  20 00 02  JSR PRNBRD              ;     Main loop      ;
            XXXX  20 5A 02  JSR USRINP              ;   ($XXXX-$XXXX)    ;
+           XXXX  A2 22
+           XXXX  A9 4F
+           XXXX  8D 86 02
+           XXXX  20 87 02
            XXXX  4C XX XX  JMP PROGLP              ;     XX bytes       ;
 ;-----------------------------------------------------------------------;
 
