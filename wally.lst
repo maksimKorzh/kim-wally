@@ -19,7 +19,7 @@
 ;    30  31  32  32  34  35  36  37  38  39  41  42  43  44  45  46     ;
 ;    31  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    32  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
-;    33  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
+;    33  2E  2E  58  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
 ;    34  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    35  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    36  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
@@ -28,13 +28,13 @@
 ;    39  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    41  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    42  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
-;    43  2E  2E  23  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
+;    43  2E  2E  58  2E  2E  2E  2E  2E  2E  2E  2E  2E  4F  2E  2E     ;
 ;    44  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    45  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;    46  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E  2E     ;
 ;                                                                       ;
 ;-----------------------------------------------------------------------;
-;       EMPTY = '.'; BLACK = '#'; WHITE = 'O'; MARKER = 6TH BIT;        ;
+;       EMPTY = '.'; BLACK = 'X'; WHITE = 'O'; MARKER = 6TH BIT;        ;
 ;-----------------------------------------------------------------------;
 
 ;-----------------------------------------------------------------------;
@@ -160,13 +160,27 @@
            02C6  18        CLC                     ;                    ;
            02C7  90 05     BCC CNTRET              ;                    ;
 ;--------------------------------------------------;                    ;
-  MARKLB:  02C9  A9 6E     LDA #$2B                ;                    ;
+  MARKLB:  02C9  A9 2B     LDA #$2B                ;                    ;
            02CB  95 00     STA BOARD,X             ;                    ;
            02CD  C8        INY                     ;                    ;
 ;--------------------------------------------------;                    ;
   CNTRET:  02CE  60        RTS                     ;                    ;
 ;-----------------------------------------------------------------------;
-
+  WEFECT:  02CF  A9 58     LDA #BLACK              ;                    ;
+                 8D 86 02  STA CCOLOR              ;                    ;
+                 A2 00     LDX #$00                ;                    ;
+  WCNTLP:        20 87 02  JSR COUNTL              ;                    ;
+                 C0 00     CPY #$00                ;                    ;
+                 D0 FF(0A) BNE WENEXT              ;                    ;
+  CGROUP:        B5 00     LDA BOARD,X             ;                    ;
+                 C9 78     CMP #$78                ;                    ;
+                 D0 FF(04) BNE WNEXT               ;                    ;
+                 A9 2E     LDA #EMPTY              ;                    ;
+                 95 00     STA BOARD,X             ;                    ;
+  WENEXT:        E8        INX                     ;                    ;
+                 D0 FF(EC) BNE WCNTLP              ;                    ;
+  WEFRET:        60        RTS                     ;                    ;
+;-----------------------------------------------------------------------;
 
 
 
@@ -175,17 +189,14 @@
            XXXX  20 1F 02  JSR CLRBRD              ;   ($XXXX-$XXXX)    ;
            XXXX  20 39 02  JSR PCOORD              ;      7 bytes       ;
 ;--------------------------------------------------;                    ;
-           XXXX  A9 4F     LDA #$4F
+           XXXX  A9 58     LDA #BLACK
            XXXX  85 22
            XXXX  85 23
            XXXX  85 24
 ;-----------------------------------------------------------------------;
   PROGLP:  XXXX  20 00 02  JSR PRNBRD              ;     Main loop      ;
            XXXX  20 5A 02  JSR USRINP              ;   ($XXXX-$XXXX)    ;
-           XXXX  A2 22
-           XXXX  A9 4F
-           XXXX  8D 86 02
-           XXXX  20 87 02
+           XXXX  20 CF 02  JSR WEFECT              ;                    ;
            XXXX  4C XX XX  JMP PROGLP              ;     XX bytes       ;
 ;-----------------------------------------------------------------------;
 
