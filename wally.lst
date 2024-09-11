@@ -172,7 +172,7 @@
   WCNTLP:        20 87 02  JSR COUNTL              ;                    ;
                  C0 00     CPY #$00                ;                    ;
                  D0 FF(0A) BNE WENEXT              ;                    ;
-  CGROUP:        B5 00     LDA BOARD,X             ;                    ;
+  CGROUP:  02DD  B5 00     LDA BOARD,X             ;                    ;
                  C9 78     CMP #$78                ;                    ;
                  D0 FF(04) BNE WNEXT               ;                    ;
                  A9 2E     LDA #EMPTY              ;                    ;
